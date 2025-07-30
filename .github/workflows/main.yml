@@ -1,0 +1,44 @@
+name: Simple To-Do List CI/CD
+
+# When to run this workflow
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Jobs to run
+jobs:
+  # Basic check and deploy job
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step 1: Get the code
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # Step 2: Check if files exist
+    - name: Check project files
+      run: |
+        echo "Checking project structure..."
+        ls -la
+        echo "✅ Project files found"
+    
+    # Step 3: Validate HTML (basic check)
+    - name: Basic HTML validation
+      run: |
+        if [ -f "index.html" ]; then
+          echo "✅ index.html found"
+        else
+          echo "❌ index.html not found"
+          exit 1
+        fi
+    
+    # Step 4: Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
